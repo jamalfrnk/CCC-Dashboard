@@ -1,4 +1,4 @@
-# Crypto Command Center (Lite MVP)
+# FDS Command Center (Lite MVP)
 
 **Status:** `READY FOR DEMO`  
 **Version:** `1.0.0-LITE`
