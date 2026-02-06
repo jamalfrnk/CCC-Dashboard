@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { runTests } from "@/tests/unit/runner";
+import { runTests as runUnitTests } from "@/tests/unit/runner";
+import { runIntegrationTests } from "@/tests/integration/runner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, ArrowLeft } from "lucide-react";
@@ -7,13 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 
 export default function TestRunnerPage() {
-  const [results, setResults] = useState<{ name: string; passed: boolean; message: string }[]>([]);
+  const [unitResults, setUnitResults] = useState<{ name: string; passed: boolean; message: string }[]>([]);
+  const [integrationResults, setIntegrationResults] = useState<{ name: string; passed: boolean; message: string }[]>([]);
 
   useEffect(() => {
-    // Run tests on mount
-    setResults(runTests());
+    const run = async () => {
+      setUnitResults(runUnitTests());
+      setIntegrationResults(await runIntegrationTests());
+    };
+    run();
   }, []);
 
+  const results = [...unitResults, ...integrationResults];
   const passedCount = results.filter(r => r.passed).length;
   const totalCount = results.length;
 
@@ -26,7 +32,7 @@ export default function TestRunnerPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold font-mono tracking-tight text-primary">UNIT TEST RUNNER</h1>
+          <h1 className="text-3xl font-bold font-mono tracking-tight text-primary">TEST RUNNER (UNIT + INTEGRATION)</h1>
           <p className="text-muted-foreground mt-1 text-sm font-mono">
             STATUS: {passedCount === totalCount ? "ALL SYSTEMS GO" : "FAILURES DETECTED"}
           </p>
@@ -36,11 +42,11 @@ export default function TestRunnerPage() {
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-             <CardTitle className="font-mono text-sm">Test Suite Results</CardTitle>
+             <CardTitle className="font-mono text-sm">Integration Tests (API Layer)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {results.map((result, idx) => (
+              {integrationResults.map((result, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 border border-border rounded bg-card/50">
                   <span className="font-mono text-sm">{result.name}</span>
                   <Badge variant="outline" className={result.passed ? "text-emerald-500 border-emerald-500/30" : "text-destructive border-destructive/30"}>
@@ -50,8 +56,24 @@ export default function TestRunnerPage() {
                 </div>
               ))}
             </div>
-            <div className="mt-6 pt-4 border-t border-border text-right font-mono text-sm text-muted-foreground">
-              Total Tests: {totalCount} | Passed: <span className="text-emerald-500">{passedCount}</span> | Failed: <span className="text-destructive">{totalCount - passedCount}</span>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+             <CardTitle className="font-mono text-sm">Unit Tests (Risk & Logic)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {unitResults.map((result, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 border border-border rounded bg-card/50">
+                  <span className="font-mono text-sm">{result.name}</span>
+                  <Badge variant="outline" className={result.passed ? "text-emerald-500 border-emerald-500/30" : "text-destructive border-destructive/30"}>
+                    {result.passed ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
+                    {result.message}
+                  </Badge>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

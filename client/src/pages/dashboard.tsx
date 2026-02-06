@@ -1,5 +1,6 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import { db } from "@/lib/db/mock-db";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,24 +13,24 @@ export default function Dashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: snapshot, isLoading: isLoadingSnap } = useQuery({
-    queryKey: ['latestSnapshot'],
-    queryFn: () => db.getLatestSnapshot()
+  const { data: snapshots, isLoading: isLoadingSnap } = useQuery({
+    queryKey: ['snapshots'],
+    queryFn: () => api.getSnapshots()
   });
 
   const { data: alerts, isLoading: isLoadingAlerts } = useQuery({
     queryKey: ['activeAlerts'],
-    queryFn: () => db.getAlerts()
+    queryFn: () => api.getAlerts({ status: 'active' })
   });
 
   const { data: journal, isLoading: isLoadingJournal } = useQuery({
-    queryKey: ['latestJournal'],
-    queryFn: () => db.getJournal()
+    queryKey: ['journal'],
+    queryFn: () => api.getJournal()
   });
 
   const { data: positions } = useQuery({
     queryKey: ['positions'],
-    queryFn: () => db.getPositions()
+    queryFn: () => api.getDefiPositions()
   });
 
   const handleRunSeed = async () => {
@@ -41,7 +42,8 @@ export default function Dashboard() {
     });
   };
 
-  const activeAlerts = alerts?.filter(a => !a.acknowledged) || [];
+  const snapshot = snapshots?.[snapshots.length - 1];
+  const activeAlerts = alerts || [];
   const latestJournal = journal?.[journal.length - 1];
 
   return (

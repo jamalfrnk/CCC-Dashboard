@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { db } from "@/lib/db/mock-db";
+import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,7 +17,7 @@ import { Link } from "wouter";
 export default function TradesPage() {
   const { data: trades, isLoading } = useQuery({
     queryKey: ['trades'],
-    queryFn: () => db.getTrades()
+    queryFn: () => api.getTrades()
   });
 
   return (
