@@ -1,7 +1,6 @@
-// FDS Lite Command Center - Design System
-// Aesthetic: Dark Future / Institutional DeFi
-// Colors: Deep Blacks, Slate Grays, Electric Blue (Safe), Amber (Warning), Crimson (Risk)
-
+/* FDS Lite Command Center - Design System */
+/* Aesthetic: Dark Future / Institutional DeFi */
+/* Colors: Deep Blacks, Slate Grays, Electric Blue (Safe), Amber (Warning), ... */
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -71,6 +70,6 @@
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-mono tracking-tight;
+    /* tracking-normal removed (default letter-spacing is normal) */
   }
 }

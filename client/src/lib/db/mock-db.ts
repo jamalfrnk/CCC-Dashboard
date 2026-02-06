@@ -2,38 +2,34 @@
 // In a real app, this would be Prisma/Postgres.
 // Here, we use an in-memory store with local storage persistence for the mockup.
 
-export type Trade = {
-  id: string;
-  symbol: string;
-  side: 'buy' | 'sell';
-  amount: number;
-  price: number;
-  timestamp: string;
-};
-
-export type PortfolioSnapshot = {
-  id: string;
-  date: string;
-  totalValue: number;
-  cashBalance: number;
-  positionsValue: number;
-};
+import { DatabaseSchema, Trade, PortfolioSnapshot, DefiPosition, RiskAlert, AiJournalEntry } from "../types";
+import { generateSeedData } from "../seed";
 
 class MockDB {
-  private trades: Trade[] = [];
-  private snapshots: PortfolioSnapshot[] = [];
+  private data: DatabaseSchema;
 
   constructor() {
+    this.data = {
+      user: null,
+      snapshots: [],
+      trades: [],
+      defiPositions: [],
+      alerts: [],
+      journal: []
+    };
     this.load();
   }
 
   private load() {
     if (typeof window === 'undefined') return;
     try {
-      const storedTrades = localStorage.getItem('fds_trades');
-      const storedSnapshots = localStorage.getItem('fds_snapshots');
-      if (storedTrades) this.trades = JSON.parse(storedTrades);
-      if (storedSnapshots) this.snapshots = JSON.parse(storedSnapshots);
+      const storedData = localStorage.getItem('fds_db');
+      if (storedData) {
+        this.data = JSON.parse(storedData);
+      } else {
+        // Auto-seed on first load if empty
+        this.seed();
+      }
     } catch (e) {
       console.error("Failed to load mock DB", e);
     }
@@ -41,37 +37,24 @@ class MockDB {
 
   private save() {
     if (typeof window === 'undefined') return;
-    localStorage.setItem('fds_trades', JSON.stringify(this.trades));
-    localStorage.setItem('fds_snapshots', JSON.stringify(this.snapshots));
+    localStorage.setItem('fds_db', JSON.stringify(this.data));
   }
 
-  // Trades
-  async getTrades() {
-    return this.trades;
-  }
-
-  async addTrade(trade: Trade) {
-    this.trades.push(trade);
+  public seed() {
+    console.log("Seeding Database...");
+    this.data = generateSeedData();
     this.save();
-    return trade;
+    return this.data;
   }
 
-  // Snapshots
-  async getSnapshots() {
-    return this.snapshots;
-  }
-  
-  async addSnapshot(snapshot: PortfolioSnapshot) {
-    this.snapshots.push(snapshot);
-    this.save();
-    return snapshot;
-  }
-
-  async clear() {
-    this.trades = [];
-    this.snapshots = [];
-    this.save();
-  }
+  // Getters
+  async getSnapshots() { return this.data.snapshots; }
+  async getLatestSnapshot() { return this.data.snapshots[this.data.snapshots.length - 1]; }
+  async getTrades() { return this.data.trades; }
+  async getPositions() { return this.data.defiPositions; }
+  async getAlerts() { return this.data.alerts; }
+  async getJournal() { return this.data.journal; }
 }
 
 export const db = new MockDB();
+
