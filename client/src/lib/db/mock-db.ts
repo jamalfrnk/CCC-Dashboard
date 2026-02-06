@@ -54,6 +54,7 @@ class MockDB {
   async getPositions() { return this.data.defiPositions; }
   async getAlerts() { return this.data.alerts; }
   async getJournal() { return this.data.journal; }
+  async getAllData() { return this.data; }
 }
 
 export const db = new MockDB();

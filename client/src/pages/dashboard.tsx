@@ -43,6 +43,33 @@ export default function Dashboard() {
   };
 
   const snapshot = snapshots?.[snapshots.length - 1];
+  const handleExport = async () => {
+    try {
+      const data = await api.getSheetsExport();
+      // Simple JSON download for demo
+      const jsonString = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `fds_lite_export_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Export Complete",
+        description: "Data downloaded successfully.",
+      });
+    } catch (e) {
+      toast({
+        title: "Export Failed",
+        description: "Could not generate export data.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const activeAlerts = alerts || [];
   const latestJournal = journal?.[journal.length - 1];
 
@@ -65,10 +92,15 @@ export default function Dashboard() {
                View Trades
             </Button>
            </Link>
+           <Link href="/tests">
+            <Button variant="outline" className="font-mono text-xs uppercase tracking-wider">
+               Test Runner
+            </Button>
+           </Link>
            <Button variant="outline" onClick={handleRunSeed} className="font-mono text-xs uppercase tracking-wider">
             <RefreshCcw className="w-3 h-3 mr-2" /> Reset Seed
           </Button>
-          <Button variant="default" className="font-mono text-xs uppercase tracking-wider bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button onClick={handleExport} variant="default" className="font-mono text-xs uppercase tracking-wider bg-primary hover:bg-primary/90 text-primary-foreground">
             <Download className="w-3 h-3 mr-2" /> Export
           </Button>
         </div>
