@@ -6,6 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import TradesPage from "@/pages/trades";
+import DefiPage from "@/pages/defi";
+import AlertsPage from "@/pages/alerts";
+import JournalPage from "@/pages/journal";
+import SettingsPage from "@/pages/settings";
 import TestRunnerPage from "@/pages/tests";
 
 function Router() {
@@ -13,6 +17,10 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/trades" component={TradesPage} />
+      <Route path="/defi" component={DefiPage} />
+      <Route path="/alerts" component={AlertsPage} />
+      <Route path="/journal" component={JournalPage} />
+      <Route path="/settings" component={SettingsPage} />
       <Route path="/tests" component={TestRunnerPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />

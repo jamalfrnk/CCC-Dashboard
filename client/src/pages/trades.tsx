@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,14 +11,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Filter, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
 
 export default function TradesPage() {
+  const [symbolFilter, setSymbolFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+
   const { data: trades, isLoading } = useQuery({
-    queryKey: ['trades'],
-    queryFn: () => api.getTrades()
+    queryKey: ['trades', symbolFilter, dateFilter],
+    queryFn: () => api.getTrades({ 
+      symbol: symbolFilter || undefined,
+      from: dateFilter || undefined 
+    })
   });
 
   return (
@@ -33,6 +41,26 @@ export default function TradesPage() {
           <p className="text-muted-foreground mt-1 text-sm font-mono">
             {isLoading ? "LOADING..." : `${trades?.length || 0} RECORDS FOUND`}
           </p>
+        </div>
+      </div>
+
+      <div className="flex gap-4">
+        <div className="relative max-w-sm w-full">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input 
+            placeholder="Filter by Symbol (e.g. ETH)" 
+            className="pl-8 font-mono"
+            value={symbolFilter}
+            onChange={(e) => setSymbolFilter(e.target.value.toUpperCase())}
+          />
+        </div>
+        <div className="relative max-w-sm w-full">
+          <Input 
+            type="date"
+            className="font-mono"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          />
         </div>
       </div>
 
@@ -61,25 +89,25 @@ export default function TradesPage() {
                 </TableRow>
               ) : trades && trades.length > 0 ? (
                 trades.map((trade) => (
-                  <TableRow key={trade.id} className="font-mono text-xs">
+                  <TableRow key={trade.id} className="font-mono text-xs hover:bg-muted/50">
                     <TableCell>{trade.date}</TableCell>
-                    <TableCell className="font-bold">{trade.symbol}</TableCell>
+                    <TableCell className="font-bold text-foreground">{trade.symbol}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={trade.side === 'BUY' ? "text-emerald-500 border-emerald-500/30" : "text-destructive border-destructive/30"}>
                         {trade.side}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">${trade.price.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">${trade.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell className="text-right">{trade.amount}</TableCell>
-                    <TableCell className="text-right">${(trade.price * trade.amount).toFixed(2)}</TableCell>
+                    <TableCell className="text-right">${(trade.price * trade.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell className="text-center">
-                      <span className="text-[10px] text-muted-foreground uppercase">{trade.status}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase bg-muted px-2 py-1 rounded">{trade.status}</span>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground font-mono">No trades recorded.</TableCell>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground font-mono">No trades recorded matching filters.</TableCell>
                 </TableRow>
               )}
             </TableBody>

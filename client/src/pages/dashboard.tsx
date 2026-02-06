@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import { db } from "@/lib/db/mock-db";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Activity, Shield, FileText, Download, Play, TrendingUp, TrendingDown, RefreshCcw, ArrowRight } from "lucide-react";
+import { AlertCircle, Activity, Shield, FileText, Download, Play, TrendingUp, TrendingDown, RefreshCcw, ArrowRight, Settings, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -97,6 +97,11 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex gap-2">
+           <Link href="/settings">
+             <Button variant="ghost" size="icon" title="Settings">
+               <Settings className="w-4 h-4" />
+             </Button>
+           </Link>
            <Link href="/trades">
             <Button variant="outline" className="font-mono text-xs uppercase tracking-wider">
                View Trades
@@ -155,7 +160,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-l-4 border-l-slate-500 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border-l-4 border-l-slate-500 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href='/defi'}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium font-mono text-muted-foreground">Active Positions</CardTitle>
             <Shield className="h-4 w-4 text-slate-500" />
@@ -166,7 +171,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-l-4 border-l-slate-500 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-card border-l-4 border-l-slate-500 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href='/journal'}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium font-mono text-muted-foreground">Journal</CardTitle>
             <FileText className="h-4 w-4 text-slate-500" />
@@ -302,7 +307,7 @@ export default function Dashboard() {
 
         {/* Right Column: Alerts & Journal */}
         <div className="space-y-6">
-          <Card className={activeAlerts.length > 0 ? "border-destructive/50" : ""}>
+          <Card className={`cursor-pointer ${activeAlerts.length > 0 ? "border-destructive/50" : ""}`} onClick={() => window.location.href='/alerts'}>
             <CardHeader>
               <CardTitle className="font-mono text-sm flex items-center justify-between">
                 Active Alerts
@@ -331,7 +336,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
           
-           <Card>
+           <Card className="cursor-pointer" onClick={() => window.location.href='/journal'}>
             <CardHeader>
               <CardTitle className="font-mono text-sm">Latest Journal</CardTitle>
             </CardHeader>
